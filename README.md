@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="assets/banner.svg" width="100%"
+       alt="dude: That cron really tied the job search together.">
+</p>
+
 # dude
 
 > The Dude abides. The cron hunts.
@@ -204,6 +209,7 @@ regular one, with its own checkpoint.
 | `config/*.example.*` | Templates for your profile, sources, companies, recipes, MCP servers |
 | `scripts/` | Init, timer install, Telegram delivery, known-jobs index, agent helpers |
 | `systemd/` | Unit templates and an optional AppArmor profile |
+| `assets/` | Banner and square mark (SVG) |
 | `NEW.md` / `APPLIED.md` | Your shortlist and archive (local) |
 | `data/` | Checkpoints, rejections, known-jobs index (local) |
 | `logs/` | Per-run traces and summaries (local) |
