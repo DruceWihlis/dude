@@ -1,0 +1,28 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Your data: profile, sources, CVs, results and state
+/config/profile.md
+/config/sources.md
+/config/companies.md
+/config/recipes.md
+/config/mcp.json
+/cv/*
+!/cv/.gitkeep
+/NEW.md
+/APPLIED.md
+/data/
+/logs/
+/.last_successful_date
+/.last_company_successful_date
+/.runner.lock
+/.telegram_*
+
+# Tooling
+__pycache__/
+*.pyc
+.idea/
+.vscode/
+.playwright-mcp/

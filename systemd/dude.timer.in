@@ -1,0 +1,11 @@
+[Unit]
+Description=dude: run the job scan every morning
+
+[Timer]
+OnCalendar=@ON_CALENDAR@
+Persistent=true
+AccuracySec=1min
+Unit=dude.service
+
+[Install]
+WantedBy=timers.target

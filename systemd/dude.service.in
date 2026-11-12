@@ -1,0 +1,14 @@
+[Unit]
+Description=dude: daily AI job scan
+
+[Service]
+Type=oneshot
+WorkingDirectory=@DUDE_DIR@
+ExecStart=@DUDE_DIR@/dude.sh
+ExecStartPost=@DUDE_DIR@/scripts/run_company_scan.sh
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=110min
+
+[Install]
+WantedBy=default.target
