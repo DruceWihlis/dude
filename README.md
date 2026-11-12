@@ -5,6 +5,8 @@
 
 # dude
 
+[![tests](https://github.com/drucewihlis/dude/actions/workflows/tests.yml/badge.svg)](https://github.com/drucewihlis/dude/actions/workflows/tests.yml)
+
 > The Dude abides. The cron hunts.
 
 A lazy, local AI job-search daemon that pings you on Telegram.
@@ -209,7 +211,7 @@ regular one, with its own checkpoint.
 | `config/*.example.*` | Templates for your profile, sources, companies, recipes, MCP servers |
 | `scripts/` | Init, timer install, Telegram delivery, known-jobs index, agent helpers |
 | `systemd/` | Unit templates and an optional AppArmor profile |
-| `assets/` | Banner and square mark (SVG) |
+| `assets/` | Banner, square mark and social preview image |
 | `NEW.md` / `APPLIED.md` | Your shortlist and archive (local) |
 | `data/` | Checkpoints, rejections, known-jobs index (local) |
 | `logs/` | Per-run traces and summaries (local) |
