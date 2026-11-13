@@ -20,10 +20,16 @@ jobs:
             python: "3.9"
           - os: ubuntu-latest
             python: "3.13"
+          # Stock macOS bash is 3.2; run the scripts with it, not a newer Homebrew bash.
+          - os: macos-latest
+            python: "3.13"
+            bash: /bin/bash
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
       - name: Unit tests
+        env:
+          TEST_BASH: ${{ matrix.bash || 'bash' }}
         run: python -m unittest discover -s tests -v

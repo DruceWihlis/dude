@@ -11,7 +11,7 @@
 
 A lazy, local AI job-search daemon that pings you on Telegram.
 
-Every morning a systemd timer wakes up an AI agent ([Codex CLI](https://github.com/openai/codex) or
+Every morning a timer wakes up an AI agent ([Codex CLI](https://github.com/openai/codex) or
 [Claude Code](https://github.com/anthropics/claude-code)). It reads your profile and CVs, walks your
 job boards, skips what you've already seen, checks each promising vacancy on the employer's page
 and writes a scored shortlist to `NEW.md`. Then it pings you. You read it over coffee. In a
@@ -67,7 +67,7 @@ It never applies, never messages employers and never edits your CVs. The rest is
 ## How it works
 
 ```text
-systemd timer ──▶ dude.sh ──▶ codex exec  or  claude -p
+timer ──▶ dude.sh ──▶ codex exec  or  claude -p
                      │            ├─ reads  config/profile.md, cv/*.pdf, config/sources.md
                      │            ├─ checks data/known_jobs.tsv before opening anything
                      │            └─ writes NEW.md, APPLIED.md, data/, config/recipes.md
@@ -112,11 +112,11 @@ A scan is mostly reading feeds and job pages. That's a job for a small model wit
 
 ## Requirements
 
-- Linux with systemd user services.
+- Linux with systemd, macOS, or Windows with WSL2 (Ubuntu). See [Platforms](#platforms).
 - Codex CLI or Claude Code, logged in. Recommended: the
   [Playwright MCP](https://github.com/microsoft/playwright-mcp) for JavaScript-heavy boards (the
   shipped `config/mcp.json` needs `npx`).
-- Python 3.9+, `curl`, `pdftotext` (`poppler-utils`).
+- Python 3.9+, `curl`, `pdftotext` (`poppler-utils` on Linux, `brew install poppler` on macOS).
 - A Telegram bot token from [@BotFather](https://t.me/BotFather).
 
 ## Setup (~5 min)
@@ -133,9 +133,27 @@ scripts/init.sh    # creates your local config and state files; never overwrites
 4. **Telegram.** Put `TG_BOT_TOKEN` in `.env`, send `/start` to your bot, then run
    `python3 scripts/telegram_notify.py --setup-test`.
 5. **First run.** `./dude.sh --check-sandbox`, then `./dude.sh --force`.
-6. **Schedule.** `scripts/install_timer.sh` (and `uninstall_timer.sh` to remove).
+6. **Schedule.** `scripts/install_timer.sh` picks the right scheduler for your OS;
+   `uninstall_timer.sh` removes it.
 
 Your profile, sources, CVs, results and state are git-ignored; `git pull` never touches them.
+
+## Platforms
+
+| | Linux | macOS | Windows |
+| --- | --- | --- | --- |
+| Runs in | your shell | your shell (stock bash 3.2 is fine) | WSL2 (Ubuntu) |
+| Scheduler | systemd user timer | LaunchAgent, hourly + at login | Task Scheduler, daily + at logon |
+| Missed scan | runs on wake (`Persistent=true`) | next hourly tick | runs on wake (`StartWhenAvailable`) |
+| Desktop alert | `notify-send` | Notification Center | Telegram only |
+
+In every case `dude.sh` decides whether a scan is due, so extra triggers cost nothing.
+
+**Windows.** Install [WSL2](https://learn.microsoft.com/windows/wsl/install) with Ubuntu, then
+follow Setup inside it. `install_timer.sh` registers a Windows task through `schtasks.exe` that
+starts WSL in the background (`conhost --headless`) to keep the console window hidden. The task
+fires at `DUDE_SCAN_HOUR` in Windows local time. Keep the repo inside the WSL filesystem
+(`~/dude`), not under `/mnt/c`.
 
 ## Daily use
 
@@ -176,7 +194,11 @@ After changing `DUDE_TZ` or `DUDE_SCAN_HOUR`, run `scripts/install_timer.sh` aga
 ## Troubleshooting
 
 - **User-namespace error from `--check-sandbox` on Ubuntu 24.04+.** AppArmor blocks the Codex
-  sandbox under systemd; see `systemd/codex-userns.apparmor`.
+  sandbox under systemd; see `scheduler/codex-userns.apparmor`.
+- **macOS: the agent is not found from the LaunchAgent.** The installer copies your current `PATH`
+  into it; rerun `scripts/install_timer.sh` from a shell where `codex` or `claude` works.
+- **Windows: the task does not start.** Check *Task Scheduler → dude → History*. If
+  `conhost --headless` is unavailable on your build, edit the action to run `wsl.exe` directly.
 - **"Send /start to the bot".** Message the bot once, or set `TG_CHAT_ID`.
 - **A board is always "Not scanned".** Run `./dude.sh --force --source=<url>` and read the newest
   file in `logs/`.

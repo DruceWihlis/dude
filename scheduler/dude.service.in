@@ -4,6 +4,7 @@ Description=dude: daily AI job scan
 [Service]
 Type=oneshot
 WorkingDirectory=@DUDE_DIR@
+Environment="PATH=@PATH@"
 ExecStart=@DUDE_DIR@/dude.sh
 ExecStartPost=@DUDE_DIR@/scripts/run_company_scan.sh
 Nice=10

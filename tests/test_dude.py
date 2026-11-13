@@ -6,12 +6,14 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+# CI on macOS sets TEST_BASH=/bin/bash to check compatibility with the stock bash 3.2.
+BASH = os.environ.get('TEST_BASH', 'bash')
 SOURCE_URL = 'https://weworkremotely.com'
 
 
 def copy_template(directory):
     """Copy tracked files only, never the developer's local config or data."""
-    for folder in ('prompts', 'scripts'):
+    for folder in ('prompts', 'scripts', 'scheduler'):
         shutil.copytree(ROOT / folder, directory / folder,
                         ignore=shutil.ignore_patterns('__pycache__'))
     (directory / 'config').mkdir()
@@ -28,7 +30,7 @@ class Runner(unittest.TestCase):
         self.directory = Path(self.temp.name) / 'dude'
         self.directory.mkdir()
         copy_template(self.directory)
-        subprocess.run(['bash', str(self.directory / 'scripts/init.sh')], check=True,
+        subprocess.run([BASH, str(self.directory / 'scripts/init.sh')], check=True,
                        capture_output=True, text=True)
         shutil.copy(self.directory / 'config/companies.example.md',
                     self.directory / 'config/companies.md')
@@ -88,10 +90,12 @@ if args == ['+%F']:
 elif args == ['+%F_%H-%M-%S']:
     print(day + '_07-00-00')
 elif args == ['+%s']:
+    import time
     run_time = os.environ.get('TEST_RUN_TIME', '05:00:00')
-    os.execv('/bin/date', ['date', '-d', day + ' ' + run_time, '+%s'])
+    print(int(time.mktime(time.strptime(day + ' ' + run_time, '%Y-%m-%d %H:%M:%S'))))
 elif args == ['+%u']:
-    os.execv('/bin/date', ['date', '-d', day, '+%u'])
+    import datetime
+    print(datetime.date.fromisoformat(day).isoweekday())
 else:
     os.execv('/bin/date', ['date', *args])
 ''')
@@ -108,13 +112,13 @@ else:
         return (self.directory / 'model-calls').read_text().splitlines()
 
     def run_runner(self, *args, force=True, **overrides):
-        return subprocess.run(['bash', str(self.directory / 'dude.sh'),
+        return subprocess.run([BASH, str(self.directory / 'dude.sh'),
                                *(['--force'] if force else []), *args],
                               cwd=self.directory, env=self.env(**overrides),
                               capture_output=True, text=True, timeout=10)
 
     def run_hook(self, **overrides):
-        return subprocess.run(['bash', str(self.directory / 'scripts/run_company_scan.sh')],
+        return subprocess.run([BASH, str(self.directory / 'scripts/run_company_scan.sh')],
                               cwd=self.directory, env=self.env(**overrides),
                               capture_output=True, text=True, timeout=10)
 
@@ -449,7 +453,7 @@ class Init(unittest.TestCase):
             directory = Path(folder)
             copy_template(directory)
             (directory / 'config/profile.md').write_text('mine\n')
-            subprocess.run(['bash', str(directory / 'scripts/init.sh')], check=True,
+            subprocess.run([BASH, str(directory / 'scripts/init.sh')], check=True,
                            capture_output=True)
             self.assertEqual((directory / 'config/profile.md').read_text(), 'mine\n')
             self.assertIn('## Active shortlist', (directory / 'NEW.md').read_text())

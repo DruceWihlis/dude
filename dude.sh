@@ -21,6 +21,7 @@ readonly RESULT_FILE="$DUDE_DIR/NEW.md"
 readonly LOG_DIR="$DUDE_DIR/logs"
 STATE_FILE="$DUDE_DIR/.last_successful_date"
 readonly LOCK_FILE="$DUDE_DIR/.runner.lock"
+readonly PORTABLE="$DUDE_DIR/scripts/portable.py"
 readonly SCHEDULE_HOUR="$(setting DUDE_SCAN_HOUR 5)"
 readonly CATCH_UP_HOUR="$(setting DUDE_CATCHUP_HOUR 18)"
 readonly SCAN_MINUTES="$(setting DUDE_SCAN_MINUTES 50)"
@@ -101,15 +102,14 @@ PY
 fi
 
 mkdir -p -- "$LOG_DIR"
-exec 9>"$LOCK_FILE"
-if ! flock -n 9; then
-  printf '%s another run is already active\n' "$(date --iso-8601=seconds)" \
-    >> "$LOG_DIR/timer.log"
-  exit 0
+# Re-run this script under an exclusive lock (flock is not available on macOS).
+if [[ -z "${DUDE_LOCK_HELD:-}" ]]; then
+  exec python3 "$PORTABLE" lock "$LOCK_FILE" "$LOG_DIR/timer.log" -- \
+    "$BASH" "$DUDE_DIR/dude.sh" "$@"
 fi
 
 log_timer() {
-  printf '%s %s\n' "$(date --iso-8601=seconds)" "$*" \
+  printf '%s %s\n' "$(date +%Y-%m-%dT%H:%M:%S%z)" "$*" \
     >> "$LOG_DIR/timer.log"
 }
 
@@ -117,16 +117,18 @@ notify_user() {
   local title="$1"
   local message="$2"
 
-  if ! command -v notify-send >/dev/null 2>&1; then
-    log_timer "notification skipped: notify-send is unavailable"
+  local sent=false
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send --app-name="dude" --urgency=normal --expire-time=15000 "$title" "$message" \
+      && sent=true
+  elif command -v osascript >/dev/null 2>&1; then
+    osascript -e "display notification \"$message\" with title \"$title\"" >/dev/null \
+      && sent=true
+  else
+    log_timer "notification skipped: no desktop notifier"
     return 0
   fi
-
-  if notify-send \
-    --app-name="dude" \
-    --urgency=normal \
-    --expire-time=15000 \
-    "$title" "$message"; then
+  if [[ "$sent" == true ]]; then
     log_timer "notification sent: $title"
   else
     log_timer "notification failed: $title"
@@ -149,9 +151,9 @@ find_codex() {
   executable "$(command -v codex 2>/dev/null || true)" && return 0
   # Codex bundled with JetBrains IDEs (AI Assistant / ACP agents).
   executable "$(
-    find "${HOME}/.cache/JetBrains" \
-      -path '*/node_modules/@openai/codex-linux-x64/vendor/*/bin/codex' \
-      -type f -executable -print 2>/dev/null \
+    find "${HOME}/.cache/JetBrains" "${HOME}/Library/Caches/JetBrains" \
+      -path '*/node_modules/@openai/codex-*/vendor/*/bin/codex' \
+      -type f -perm -u+x -print 2>/dev/null \
       | sort -V \
       | tail -n 1
   )" && return 0
@@ -167,9 +169,9 @@ find_claude() {
 
 now_epoch="$(date +%s)"
 today="$(date +%F)"
-scheduled_epoch="$(date -d "$today $SCHEDULE_HOUR:00:00" +%s)"
+scheduled_epoch="$(python3 "$PORTABLE" epoch-at "$today" "$SCHEDULE_HOUR")"
 delay_seconds=$((now_epoch - scheduled_epoch))
-catch_up_epoch="$(date -d "$today $CATCH_UP_HOUR:00:00" +%s)"
+catch_up_epoch="$(python3 "$PORTABLE" epoch-at "$today" "$CATCH_UP_HOUR")"
 
 if [[ "$force" != true ]]; then
   if (( delay_seconds < 0 )); then
@@ -313,7 +315,7 @@ run_agent() {
     args+=(-)
   fi
   local code=0
-  timeout --signal=TERM --kill-after=2m "${seconds}s" "$agent_bin" "${args[@]}" \
+  python3 "$PORTABLE" timeout "$seconds" -- "$agent_bin" "${args[@]}" \
     >> "$run_log" 2>&1 || code=$?
   if [[ "$agent" == claude ]]; then
     python3 "$DUDE_DIR/scripts/agent_events.py" summary "$run_log" "$summary_file" || true
@@ -335,7 +337,7 @@ log_timer "start: vacancy scan; source=$scan_source; agent=$agent; bin=$agent_bi
 
 set +e
 if [[ "$agent" == codex ]]; then
-  timeout 20s "$agent_bin" sandbox \
+  python3 "$PORTABLE" timeout 20 --kill-after 5 -- "$agent_bin" sandbox \
     --config 'permissions.scan.extends=":workspace"' \
     --permission-profile scan \
     --cd "$DUDE_DIR" \
@@ -343,7 +345,7 @@ if [[ "$agent" == codex ]]; then
     >> "$run_log" 2>&1
 else
   # Claude Code has no standalone sandbox probe; check that the CLI starts.
-  timeout 20s "$agent_bin" --version >> "$run_log" 2>&1
+  python3 "$PORTABLE" timeout 20 --kill-after 5 -- "$agent_bin" --version >> "$run_log" 2>&1
 fi
 exit_code=$?
 set -e

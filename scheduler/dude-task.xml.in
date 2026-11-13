@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<!-- Windows Task Scheduler task for dude inside WSL. Daily at the scan hour and at logon;
+     StartWhenAvailable runs a missed start after sleep. conhost --headless hides the console. -->
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>dude: daily AI job scan in WSL (@DISTRO@)</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <CalendarTrigger>
+      <StartBoundary>2026-01-01T@HOUR@:00:00</StartBoundary>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+    <LogonTrigger/>
+  </Triggers>
+  <Settings>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <ExecutionTimeLimit>PT2H</ExecutionTimeLimit>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>conhost.exe</Command>
+      <Arguments>--headless wsl.exe -d @DISTRO@ -- /bin/bash "@DUDE_DIR@/scripts/scheduled_run.sh"</Arguments>
+    </Exec>
+  </Actions>
+</Task>

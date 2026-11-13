@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
+# Removes the daily scan installed by install_timer.sh.
 
 set -euo pipefail
 
-readonly USER_UNIT_DIR="${HOME}/.config/systemd/user"
+readonly DUDE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=platform.sh
+source "$DUDE_DIR/scripts/platform.sh"
 
-systemctl --user disable --now dude.timer || true
-rm -f -- "$USER_UNIT_DIR/dude.timer"
-rm -f -- "$USER_UNIT_DIR/dude.service"
-systemctl --user daemon-reload
+case "$(detect_platform)" in
+  linux)
+    unit_dir="${HOME}/.config/systemd/user"
+    systemctl --user disable --now dude.timer || true
+    rm -f -- "$unit_dir/dude.timer" "$unit_dir/dude.service"
+    systemctl --user daemon-reload
+    ;;
+  macos)
+    launchctl bootout "gui/$(id -u)/$LAUNCHD_LABEL" 2>/dev/null || true
+    rm -f -- "${HOME}/Library/LaunchAgents/$LAUNCHD_LABEL.plist"
+    ;;
+  wsl)
+    schtasks.exe /Delete /TN "$WINDOWS_TASK" /F || true
+    ;;
+esac
