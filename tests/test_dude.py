@@ -271,6 +271,7 @@ else:
 
     def test_check_mode_does_not_call_model_notify_or_advance_state(self):
         self.assertEqual(self.run_runner('--check-sandbox').returncode, 0)
+        self.assertIn('start: sandbox check', (self.directory / 'logs/timer.log').read_text())
         self.assertFalse((self.directory / 'model-called').exists())
         self.assertFalse((self.directory / 'notifications').exists())
         self.assertEqual(self.state.read_text(), '2026-10-12\n')

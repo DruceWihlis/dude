@@ -324,7 +324,7 @@ run_agent() {
 }
 
 agent_version="$("$agent_bin" --version 2>/dev/null | head -n 1 || printf 'unknown')"
-log_timer "start: vacancy scan; source=$scan_source; agent=$agent; bin=$agent_bin; version=$agent_version; model=$model_label; effort=$effort_label"
+log_timer "start: $([[ "$check_sandbox" == true ]] && echo sandbox check || echo vacancy scan); source=$scan_source; agent=$agent; bin=$agent_bin; version=$agent_version; model=$model_label; effort=$effort_label"
 
 {
   printf 'agent=%s\n' "$agent"
