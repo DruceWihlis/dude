@@ -20,6 +20,13 @@ credentials. Do not list directories or read the whole archive. The runner build
 `data/known_jobs.tsv` locally; look up candidate URLs and company/title there with `rg -F` or
 `grep -F` rather than reading `APPLIED.md`.
 
+## Output budget
+
+Every command's output enters your context, so keep it small. During discovery print only compact
+records (title, company, date, location, URL) and counts; never print job descriptions, raw feeds
+or HTML. Read a description only for a candidate you are verifying. End every command that may
+print a lot with `| head -c 20000`.
+
 ## Candidate and filters
 
 Apply the target roles, seniority, stack, location, work-model, language, legal-entity, freshness

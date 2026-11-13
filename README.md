@@ -185,6 +185,7 @@ Settings live in `.env` ([`.env.example`](.env.example)); environment variables 
 | `DUDE_CATCHUP_HOUR` | `18` | No catch-up runs after this hour |
 | `DUDE_SCAN_MINUTES` | `50` | Time limit per scan, including resumes |
 | `DUDE_COMPANY_DAYS` | `1,3,5` | ISO weekdays for the company scan; empty disables it |
+| `DUDE_LOG_DAYS` | `30` | Days to keep run traces in `logs/`; `0` keeps everything |
 | `CODEX_BIN` / `CLAUDE_BIN` | on `PATH` | Paths to the CLIs |
 
 After changing `DUDE_TZ` or `DUDE_SCAN_HOUR`, run `scripts/install_timer.sh` again.

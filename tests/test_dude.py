@@ -3,6 +3,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import time
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -61,6 +62,9 @@ elif args[:2] == ['mcp', 'list']:
 else:
     assert '--json' in args
     print('{"type":"thread.started","thread_id":"test-thread"}')
+    if os.environ.get('TEST_BIG_OUTPUT'):
+        print('{"type":"item.completed","item":{"type":"command_execution",'
+              '"aggregated_output":"' + 'x' * 100000 + '"}}')
     Path('model-args').write_text('\\n'.join(args))
     Path('model-called').touch()
     if os.environ.get('TEST_REWRITE_RUNNER'):
@@ -204,6 +208,28 @@ else:
         self.assertIn('--send\n', notifications)
         self.assertIn('--run-summary', notifications)
         self.assertIn('--exit-code 0', notifications)
+
+    def test_run_log_cuts_huge_command_output_but_keeps_exit_code(self):
+        result = self.run_runner(TEST_BIG_OUTPUT='1', TEST_CODEX_EXIT='7')
+        self.assertEqual(result.returncode, 7)
+        log = next(path for path in (self.directory / 'logs').glob('*.log')
+                   if path.name != 'timer.log')
+        self.assertLess(log.stat().st_size, 20000)
+        self.assertIn('truncated 96000 chars', log.read_text())
+        self.assertIn('"thread_id": "test-thread"', log.read_text())
+
+    def test_old_traces_are_removed_but_summaries_and_timer_log_stay(self):
+        logs = self.directory / 'logs'
+        logs.mkdir(exist_ok=True)
+        old = time.time() - 40 * 86400
+        for name in ('2026-09-01_05-00-00.log', '2026-09-01_05-00-00-summary.md', 'timer.log'):
+            (logs / name).write_text('old\n')
+            os.utime(logs / name, (old, old))
+        (logs / '2026-10-20_05-00-00.log').write_text('recent\n')
+        self.assertEqual(self.run_runner().returncode, 0)
+        self.assertFalse((logs / '2026-09-01_05-00-00.log').exists())
+        for name in ('2026-09-01_05-00-00-summary.md', 'timer.log', '2026-10-20_05-00-00.log'):
+            self.assertTrue((logs / name).exists(), name)
 
     def test_missing_summary_is_failure(self):
         self.assertEqual(self.run_runner(TEST_MISSING_SUMMARY='1').returncode, 1)
@@ -445,6 +471,7 @@ class ClaudeRunner(Runner):
     test_edit_during_scan_preserves_delivery_and_completion = None
     test_reported_failure_is_not_success_even_with_cli_exit_zero = None
     test_missing_summary_is_failure = None
+    test_run_log_cuts_huge_command_output_but_keeps_exit_code = None
     test_telegram_token_never_reaches_agent_environment = None
 
 

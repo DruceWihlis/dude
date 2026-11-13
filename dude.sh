@@ -29,6 +29,7 @@ readonly AGENT_SETTING="$(setting DUDE_AGENT auto)"
 readonly MODEL="$(setting DUDE_MODEL)"
 readonly EFFORT="$(setting DUDE_EFFORT low)"
 readonly MAX_BUDGET_USD="$(setting DUDE_MAX_BUDGET_USD)"
+readonly LOG_DAYS="$(setting DUDE_LOG_DAYS 30)"
 
 force=false
 dry_run=false
@@ -264,6 +265,12 @@ if [[ "$dry_run" == true ]]; then
   exit 0
 fi
 
+# Drop old run traces; summaries and timer.log are small and stay.
+if [[ "$LOG_DAYS" =~ ^[1-9][0-9]*$ ]]; then
+  find "$LOG_DIR" -maxdepth 1 -type f -name '*.log' ! -name timer.log -mtime +"$LOG_DAYS" \
+    -exec rm -f -- {} + 2>/dev/null || true
+fi
+
 # Build the agent command. Only the browser MCP is exposed to the scan.
 agent_args=()
 if [[ "$agent" == codex ]]; then
@@ -315,8 +322,9 @@ run_agent() {
     args+=(-)
   fi
   local code=0
-  python3 "$PORTABLE" timeout "$seconds" -- "$agent_bin" "${args[@]}" \
-    >> "$run_log" 2>&1 || code=$?
+  # pipefail keeps the agent's exit code; the filter only shortens what is saved.
+  python3 "$PORTABLE" timeout "$seconds" -- "$agent_bin" "${args[@]}" 2>&1 \
+    | python3 "$DUDE_DIR/scripts/agent_events.py" compact >> "$run_log" || code=$?
   if [[ "$agent" == claude ]]; then
     python3 "$DUDE_DIR/scripts/agent_events.py" summary "$run_log" "$summary_file" || true
   fi
