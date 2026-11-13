@@ -41,6 +41,9 @@ fictional candidate from the example profile.
 - **Reports honestly.** A partial or capped scan says so. Every summary shows tokens spent (and
   USD on Claude Code).
 
+- **Drafts applications when you ask.** Send a vacancy link to `/abide` and get the CV to use,
+  answers for every form field and a cover letter. You press Submit.
+
 It never applies, never messages employers and never edits your CVs. The rest is up to you, man.
 
 ## How it works
@@ -146,6 +149,28 @@ closed jobs to `APPLIED.md`.
 ./dude.sh --source=https://himalayas.app/jobs  # one source from sources.md
 ./dude.sh --companies --force                  # company watchlist scan
 ```
+
+## Apply with `/abide`
+
+Found something good? Hand the link to the agent in the repo folder:
+
+```bash
+claude "/abide https://jobs.example.com/123"    # Claude Code
+codex '$abide https://jobs.example.com/123'     # Codex CLI
+```
+
+A bare vacancy link works too. The skill reads your profile and every CV, opens the vacancy and its
+application form, and returns:
+
+- **Fit:** blockers first (country, work authorization, seniority).
+- **Selected CV** with the reason, plus `Before / After` edits only where they matter.
+- **Form answers**, one per field. Facts it doesn't have become `[ask: ...]`, never guesses.
+- **Cover letter**, if the form has a field for one, checked against a short list of
+  AI-sounding phrases ([`writing.md`](.agents/skills/abide/writing.md)).
+
+Drafts are saved to `applications/` (git-ignored). Standard answers (right to work, notice
+period, salary, sign-off) come from `## Applications` in `config/profile.md`. Tell it you
+submitted and it marks the job `APPLIED` in `NEW.md`.
 
 ## Configuration
 

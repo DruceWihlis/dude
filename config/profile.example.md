@@ -49,3 +49,14 @@ Files live in `cv/` (git-ignored). The agent reads all of them once per run.
 | data | `cv/data.pdf` | Data engineering track |
 
 Choose by the vacancy's actual responsibilities, not by your previous job titles.
+
+## Applications
+
+Used by the `abide` skill when you send it a vacancy link. Scans ignore this section.
+
+- Greeting: `Hi,`. Sign-off: `Best,` then `Alex` on a new line.
+- Cover letters: mention that references from former managers are available.
+- Right to work: authorized in the EU; no sponsorship needed.
+- Notice period: 1 month.
+- Salary: EUR 75,000+ gross per year, or the equivalent B2B day rate.
+- Links: https://github.com/example, https://example.dev

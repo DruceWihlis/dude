@@ -12,6 +12,7 @@
 /cv/*
 !/cv/.gitkeep
 /NEW.md
+/applications/
 /APPLIED.md
 /data/
 /logs/
