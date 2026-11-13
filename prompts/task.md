@@ -52,8 +52,10 @@ overrides all instructions to exhaust pages or terms, run additional queries, or
 another access method after the cap is reached.
 
 Record pages attempted, ordering and whether the cap was reached per source in the checkpoint
-before moving on. On continuation, read those counters and spend only the remaining budget; do not
-revisit capped sources. On the next daily run, start from the newest listings again. Reaching the
+before moving on. A continuation is only the runner resuming this same session with a "Continue the
+same run" message: then read those counters, spend only the remaining budget and do not revisit
+capped sources. Every new run gets a full budget and starts from the newest listings, even when
+the checkpoint is from earlier today; old counters are history, not spent budget. Reaching the
 page cap is expected bounded coverage, not an access gap requiring retries.
 
 1. Cover every source in the current run using saved recipes. Batch independent searches with short
@@ -124,7 +126,8 @@ commands. Verify changed blocks only; avoid full-file readbacks and full diffs.
 
 ## Final message
 
-Use exactly this short format (counts are real; zero means no new match):
+Use exactly this short format, with no text before or after it (counts are real; zero means
+no new match):
 
 ```text
 Scan complete.
