@@ -17,34 +17,13 @@ job boards, skips what you've already seen, checks each promising vacancy on the
 and writes a scored shortlist to `NEW.md`. Then it pings you. You read it over coffee. In a
 bathrobe, ideally.
 
-```text
-🎳 New shit has come to light, man.
+<p align="center">
+  <img src="assets/tg-notify.png" width="420"
+       alt="Telegram: a scored vacancy from We Work Remotely, then the run summary with token usage">
+</p>
 
-Example Corp — Senior Backend Engineer — 8/10
-
-• Status: NEW
-• Published: 2026-11-10
-• Location: EU; remote
-• Vacancy: https://jobs.example.com/123
-• Fit: Python + Kafka platform team, matches the last 4 years
-• Concerns: on-call rotation not described
-• CV: backend, cv/backend.pdf. Reason: platform focus
-```
-
-After each run you also get a summary, with the bill:
-
-```text
-🎳 Mark it zero.
-Run: 2026-11-12_05-00-03
-
-Scan complete.
-New: 0 | Archived: 1
-Scanned: weworkremotely.com, himalayas.app, trulyremote.co, web3.career
-Coverage: bounded
-Limits: himalayas.app — 3 pages, cap reached
-
-gpt-6-luna / low | Tokens: 412,880 | in: 401,233 (cached: 362,112) | out: 11,647
-```
+One message per new job, then a run summary with the bill. A real run on a cheap model, for the
+fictional candidate from the example profile.
 
 ## What it does
 
