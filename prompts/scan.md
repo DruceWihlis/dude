@@ -12,6 +12,6 @@ First tool call: read all startup material in ONE shell call, without directory 
 cat prompts/task.md config/profile.md config/sources.md config/recipes.md data/checkpoint.md NEW.md
 ```
 
-Second tool call: extract every CV listed in `config/profile.md` in ONE shell call
-(`pdftotext <path> -` for each PDF, `cat` for text files). Report each failure and continue with
-the available facts. Then follow `prompts/task.md`.
+Second tool call: extract every CV listed in `config/profile.md` in ONE shell call:
+`python3 scripts/cv_text.py <path>...` (PDF, DOCX, ODT, Markdown or text; run it, don't read
+it). Report each failure and continue with the available facts. Then follow `prompts/task.md`.

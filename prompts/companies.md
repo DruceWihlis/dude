@@ -26,5 +26,6 @@ First tool call: read startup material in ONE shell call:
 cat prompts/task.md config/profile.md config/companies.md config/recipes.md data/company_checkpoint.md NEW.md
 ```
 
-Second tool call: extract every CV listed in `config/profile.md` in ONE shell call. Report failures
+Second tool call: extract every CV listed in `config/profile.md` in ONE shell call
+(`python3 scripts/cv_text.py <path>...`). Report failures
 and continue with the available facts. Use the normal final message format.

@@ -11,6 +11,7 @@
 /config/mcp.json
 /cv/*
 !/cv/.gitkeep
+!/cv/*.example.md
 /NEW.md
 /applications/
 /APPLIED.md

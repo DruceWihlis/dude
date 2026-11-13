@@ -12,7 +12,8 @@ source scope and checkpoint paths. Candidate filters and CV policy are shared.
 ## Read once
 
 Read this file, `config/profile.md`, the current run's sources and checkpoint,
-`config/recipes.md`, `NEW.md` and every CV listed in the profile (`pdftotext <path> -` for PDFs).
+`config/recipes.md`, `NEW.md` and every CV listed in the profile
+(`python3 scripts/cv_text.py <path>...` reads any format in one call).
 Disclose unreadable CVs and continue with the available facts.
 
 Never read `logs/` (including the current live log), scripts, `.env`, `.telegram_*` files or other

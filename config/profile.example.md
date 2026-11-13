@@ -41,12 +41,13 @@ Exclude: staff / principal roles, pure frontend, management-only roles, on-call-
 
 ## CVs
 
-Files live in `cv/` (git-ignored). The agent reads all of them once per run.
+Files live in `cv/` (git-ignored): PDF, DOCX, ODT, Markdown or plain text. The agent reads all
+of them once per run. The two examples below are what `scripts/init.sh` puts in `cv/`.
 
 | Label | Path | Use for |
 | --- | --- | --- |
-| backend | `cv/backend.pdf` | Default for backend and platform roles |
-| data | `cv/data.pdf` | Data engineering track |
+| backend | `cv/backend.md` | Default for backend and platform roles |
+| data | `cv/data.md` | Data engineering track |
 
 Choose by the vacancy's actual responsibilities, not by your previous job titles.
 

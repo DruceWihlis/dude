@@ -50,7 +50,7 @@ It never applies, never messages employers and never edits your CVs. The rest is
 
 ```text
 timer ──▶ dude.sh ──▶ codex exec  or  claude -p
-                     │            ├─ reads  config/profile.md, cv/*.pdf, config/sources.md
+                     │            ├─ reads  config/profile.md, cv/*, config/sources.md
                      │            ├─ checks data/known_jobs.tsv before opening anything
                      │            └─ writes NEW.md, APPLIED.md, data/, config/recipes.md
                      └─▶ telegram_notify.py ──▶ one message per new job + a run summary
@@ -98,7 +98,8 @@ A scan is mostly reading feeds and job pages. That's a job for a small model wit
 - Codex CLI or Claude Code, logged in. Recommended: the
   [Playwright MCP](https://github.com/microsoft/playwright-mcp) for JavaScript-heavy boards (the
   shipped `config/mcp.json` needs `npx`).
-- Python 3.9+, `curl`, `pdftotext` (`poppler-utils` on Linux, `brew install poppler` on macOS).
+- Python 3.9+ and `curl`. For PDF CVs also `pdftotext` (`poppler-utils` on Linux,
+  `brew install poppler` on macOS).
 - A Telegram bot token from [@BotFather](https://t.me/BotFather).
 
 ## Setup (~5 min)
@@ -109,8 +110,11 @@ scripts/init.sh    # creates your local config and state files; never overwrites
 ```
 
 1. **Profile.** Edit `config/profile.md`: who you are, target roles, filters, which CV to use when.
-   The shipped example is a fictional backend engineer.
-2. **CVs.** Put PDFs into `cv/` and list them in the profile.
+   The shipped example is a fictional backend engineer with two example CVs
+   ([backend](cv/backend.example.md), [data](cv/data.example.md)), so a first run works as is.
+2. **CVs.** Put your CVs into `cv/` and list them in the profile. PDF, DOCX, ODT, Markdown and
+   plain text all work; save an old `.doc` as DOCX or PDF first. Several versions are welcome:
+   the agent picks one per vacancy. Delete the example CVs once yours are in.
 3. **Sources.** Edit `config/sources.md`. `config/recipes.md` already knows the example boards.
 4. **Telegram.** Put `TG_BOT_TOKEN` in `.env`, send `/start` to your bot, then run
    `python3 scripts/telegram_notify.py --setup-test`.

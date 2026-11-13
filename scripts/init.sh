@@ -25,7 +25,14 @@ copy_example() {
 
 copy_example .env.example .env
 chmod 600 .env
+new_profile=''
+[[ -e config/profile.md ]] || new_profile=1
 copy_example config/profile.example.md config/profile.md
+# Example CVs only come with the example profile that lists them.
+if [[ -n "$new_profile" ]]; then
+  copy_example cv/backend.example.md cv/backend.md
+  copy_example cv/data.example.md cv/data.md
+fi
 copy_example config/sources.example.md config/sources.md
 copy_example config/recipes.example.md config/recipes.md
 copy_example config/mcp.example.json config/mcp.json
@@ -52,7 +59,8 @@ printf '# Company scan checkpoint\n\nNo runs yet.\n' | create data/company_check
 cat <<'NEXT'
 
 Next:
-  1. Edit config/profile.md: who you are, what you want, where your CVs live (put PDFs in cv/).
+  1. Edit config/profile.md: who you are, what you want, which CVs to use. Put your CVs in cv/
+     (PDF, DOCX, ODT, Markdown or text) and delete the examples.
   2. Edit config/sources.md: the job boards to scan.
   3. Put TG_BOT_TOKEN in .env, send /start to your bot, run:
        python3 scripts/telegram_notify.py --setup-test

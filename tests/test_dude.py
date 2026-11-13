@@ -20,6 +20,9 @@ def copy_template(directory):
     (directory / 'config').mkdir()
     for example in (ROOT / 'config').glob('*.example.*'):
         shutil.copy(example, directory / 'config' / example.name)
+    (directory / 'cv').mkdir()
+    for example in (ROOT / 'cv').glob('*.example.md'):
+        shutil.copy(example, directory / 'cv' / example.name)
     for name in ('dude.sh', '.env.example'):
         shutil.copy(ROOT / name, directory / name)
 
@@ -486,6 +489,21 @@ class Init(unittest.TestCase):
             self.assertEqual((directory / 'config/profile.md').read_text(), 'mine\n')
             self.assertIn('## Active shortlist', (directory / 'NEW.md').read_text())
             self.assertEqual(oct((directory / '.env').stat().st_mode & 0o777), '0o600')
+
+    def test_init_adds_example_cvs_only_with_the_example_profile(self):
+        with tempfile.TemporaryDirectory() as folder:
+            directory = Path(folder)
+            copy_template(directory)
+            subprocess.run([BASH, str(directory / 'scripts/init.sh')], check=True,
+                           capture_output=True)
+            profile = (directory / 'config/profile.md').read_text()
+            for name in ('backend.md', 'data.md'):
+                self.assertTrue((directory / 'cv' / name).exists())
+                self.assertIn(f'`cv/{name}`', profile)
+                (directory / 'cv' / name).unlink()
+            subprocess.run([BASH, str(directory / 'scripts/init.sh')], check=True,
+                           capture_output=True)
+            self.assertFalse((directory / 'cv/backend.md').exists())
 
 
 if __name__ == '__main__':

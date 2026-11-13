@@ -20,8 +20,9 @@ never do.
 
 ## Steps
 
-1. **Read once.** In one shell call: `cat config/profile.md`, then `pdftotext <path> -` for every
-   CV listed in it (`cat` for text CVs). Report an unreadable CV and continue with the rest.
+1. **Read once.** In one shell call: `cat config/profile.md`, then
+   `python3 scripts/cv_text.py <path>...` for every CV listed in it (any of PDF, DOCX, ODT,
+   Markdown, text). Report an unreadable CV and continue with the rest.
 2. **Read the vacancy** with `curl` or a web fetch; use the Playwright MCP if the page needs
    JavaScript. Extract responsibilities, requirements, location and eligibility, compensation, and
    the application form: every field with its label, type, options and required flag. If the form
