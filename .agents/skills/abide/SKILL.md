@@ -13,6 +13,7 @@ never do.
 - Facts come only from the CVs and `config/profile.md`. Never invent skills, years, numbers,
   employers or opinions. Keep the real scope of each experience: "helped with" stays "helped with".
 - If facts conflict, the profile wins over CVs; flag conflicts that affect this application.
+- Name, email, phone and links shown in a CV or the profile are facts: use them.
 - A missing fact becomes a placeholder `[ask: <question>]`, never a guess.
 - Never submit forms, create accounts, message anyone or edit CVs, the profile or scan state.
 - Do not read `.env`, `.telegram_*` or `logs/`.
@@ -25,6 +26,9 @@ never do.
    JavaScript. Extract responsibilities, requirements, location and eligibility, compensation, and
    the application form: every field with its label, type, options and required flag. If the form
    is on a separate apply page, open it. If it is behind a login, say so and continue without it.
+   If a job board blocks you, search for the same role on the employer's careers page or ATS
+   (Greenhouse, Lever, Ashby, Workable) and confirm it matches. If the user pasted the vacancy text
+   instead of a link, use that. Only if all of this fails, ask for the text and stop.
 3. **Check fit** against the profile's target roles and filters. Lead with blockers (country,
    work authorization, language, seniority) in one line each. If a hard filter fails, say so and
    ask whether to continue before drafting.
