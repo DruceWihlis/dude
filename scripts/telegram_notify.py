@@ -70,7 +70,7 @@ def recipient(directory, config):
         if chat.get('type') == 'private' and command and command[0].split('@')[0] == '/start':
             chats.add(chat['id'])
     if len(chats) != 1:
-        raise RuntimeError('Send /start to the bot; if multiple chats exist, set TG_CHAT_ID in .env.')
+        raise RuntimeError('Send /start to the bot; with several chats, set TG_CHAT_ID in .env.')
     chat_id = str(chats.pop())
     path.write_text(chat_id + '\n')
     path.chmod(0o600)

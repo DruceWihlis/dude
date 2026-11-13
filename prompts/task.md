@@ -1,7 +1,7 @@
 # Daily vacancy scan
 
-All paths are relative to the repository root. The candidate, target roles, filters, CVs and page
-budget are defined in `config/profile.md`. These rules apply to every candidate.
+Paths are relative to the repository root. The candidate, target roles, filters, CVs and page
+budget are defined in `config/profile.md`.
 
 ## Run scope
 
@@ -54,10 +54,10 @@ page cap is expected bounded coverage, not an access gap requiring retries.
    discovery pass per source, followed only by targeted queries for a specific coverage gap. No
    generic cross-board searches or repeated equivalent queries. Follow the general access procedure
    at the top of `config/recipes.md`; print compact records and counts, not raw feed/HTML bodies.
-   Use each saved direct board/feed recipe; indexed web search alone cannot establish complete
-   coverage. Apply the saved HTTP/browser fallback before declaring an access gap. Complete
-   discovery across sources before candidate research. An empty or sparse result allows one
-   targeted fallback for that gap, not repeated broad searches.
+   Indexed web search alone cannot establish complete coverage. Apply the saved HTTP/browser
+   fallback before declaring an access gap. Complete discovery across sources before candidate
+   research. An empty or sparse result allows one targeted fallback for that gap, not repeated
+   broad searches.
 2. Deduplicate by canonical URL (strip tracking parameters), then by normalized company + title +
    location. Consult `data/known_jobs.tsv` by URL and company/title BEFORE opening or researching a
    candidate. Batch lookups; do not repeat unchanged lookups. Reopen a rejected or archived job only
@@ -74,8 +74,9 @@ page cap is expected bounded coverage, not an access gap requiring retries.
 4. On a DNS or connection failure, stop the other terms for that source. If the shell is sandboxed
    and your tools support escalation (Codex: `sandbox_permissions=require_escalated`), retry the
    public request once with it; the approval reviewer decides whether to allow it. Do not treat
-   sandbox DNS failure as site downtime. If still unavailable, try an available JS browser once. Never repeat a failed access method with the same
-   permissions. Empty text extraction proves nothing.
+   sandbox DNS failure as site downtime. If still unavailable, try an available JS browser once.
+   Never repeat a failed access method with the same permissions. Empty text extraction proves
+   nothing.
 5. Recheck active entries for closure or passed deadlines. Move inactive entries to `APPLIED.md`,
    preserving their complete text and user statuses; use EXPIRED only for confirmed closure or a
    passed deadline, and never overwrite a user status.
