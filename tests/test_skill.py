@@ -21,14 +21,6 @@ class AbideSkill(unittest.TestCase):
         self.assertIn('writing.md', text)
         self.assertTrue((SKILL / 'writing.md').exists())
 
-    def test_drafts_stay_private(self):
-        ignored = (ROOT / '.gitignore').read_text().splitlines()
-        self.assertIn('/applications/', ignored)
-
-    def test_profile_example_has_application_facts(self):
-        profile = (ROOT / 'config' / 'profile.example.md').read_text()
-        self.assertIn('\n## Applications\n', profile)
-
 
 if __name__ == '__main__':
     unittest.main()

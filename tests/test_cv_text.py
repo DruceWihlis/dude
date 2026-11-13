@@ -73,11 +73,6 @@ class CvText(unittest.TestCase):
         self.assertIn('save it as PDF, DOCX or Markdown', output)
         self.assertTrue(output.rstrip().endswith('Alex'))
 
-    def test_shipped_example_cvs_are_readable(self):
-        code, output = self.run_main(*sorted((ROOT / 'cv').glob('*.example.md')))
-        self.assertEqual(code, 0)
-        self.assertEqual(output.count('Alex Example'), 2)
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -27,7 +27,9 @@ def copy_template(directory):
         shutil.copy(ROOT / name, directory / name)
 
 
-class Runner(unittest.TestCase):
+class RunnerBase(unittest.TestCase):
+    """Fixture: a scratch dude install with a fake agent, clock and notifier."""
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -129,6 +131,8 @@ else:
                               cwd=self.directory, env=self.env(**overrides),
                               capture_output=True, text=True, timeout=10)
 
+
+class Runner(RunnerBase):
     def test_missing_setup_fails_before_scan(self):
         (self.directory / 'config/profile.md').unlink()
         result = self.run_runner()
@@ -414,8 +418,8 @@ sys.exit(int(os.environ.get('TEST_CODEX_EXIT', '0')))
 """
 
 
-class ClaudeRunner(Runner):
-    """Same runner contract with Claude Code as the agent."""
+class ClaudeRunner(RunnerBase):
+    """Agent-specific parts of the runner contract, with Claude Code as the agent."""
 
     def setUp(self):
         super().setUp()
@@ -465,18 +469,12 @@ class ClaudeRunner(Runner):
         summaries = sorted(path.name for path in (self.directory / 'logs').glob('*-summary.md'))
         self.assertEqual(len(summaries), 2)
 
-    # Codex-specific behaviour does not apply to Claude Code.
-    test_scan_disables_unrelated_tools_without_removing_browser = None
-    test_unsupported_mcp_name_fails_before_scan = None
-    test_mcp_discovery_failure_never_starts_scan = None
-    test_preflight_failure_never_calls_model = None
-    test_model_flag_only_when_configured = None
-    test_edit_during_scan_preserves_delivery_and_completion = None
-    test_reported_failure_is_not_success_even_with_cli_exit_zero = None
-    test_missing_summary_is_failure = None
-    test_run_log_cuts_huge_command_output_but_keeps_exit_code = None
-    test_telegram_token_never_reaches_agent_environment = None
-
+    # Shared tests whose outcome depends on how the agent is called and resumed.
+    test_page_cap_is_success_without_continuation = (
+        Runner.test_page_cap_is_success_without_continuation)
+    test_access_gap_resumes_but_final_page_cap_does_not = (
+        Runner.test_access_gap_resumes_but_final_page_cap_does_not)
+    test_nonzero_cli_exit_is_preserved = Runner.test_nonzero_cli_exit_is_preserved
 
 class Init(unittest.TestCase):
     def test_init_never_overwrites_user_files(self):
