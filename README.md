@@ -112,7 +112,7 @@ A scan is mostly reading feeds and job pages. That's a job for a small model wit
 
 ## Requirements
 
-- Linux with systemd, macOS, or Windows with WSL2 (Ubuntu). See [Platforms](#platforms).
+- Linux with systemd, macOS, or Windows with WSL2 (experimental). See [Platforms](#platforms).
 - Codex CLI or Claude Code, logged in. Recommended: the
   [Playwright MCP](https://github.com/microsoft/playwright-mcp) for JavaScript-heavy boards (the
   shipped `config/mcp.json` needs `npx`).
@@ -140,7 +140,7 @@ Your profile, sources, CVs, results and state are git-ignored; `git pull` never 
 
 ## Platforms
 
-| | Linux | macOS | Windows |
+| | Linux | macOS | Windows (experimental) |
 | --- | --- | --- | --- |
 | Runs in | your shell | your shell (stock bash 3.2 is fine) | WSL2 (Ubuntu) |
 | Scheduler | systemd user timer | LaunchAgent, hourly + at login | Task Scheduler, daily + at logon |
@@ -149,11 +149,12 @@ Your profile, sources, CVs, results and state are git-ignored; `git pull` never 
 
 In every case `dude.sh` decides whether a scan is due, so extra triggers cost nothing.
 
-**Windows.** Install [WSL2](https://learn.microsoft.com/windows/wsl/install) with Ubuntu, then
-follow Setup inside it. `install_timer.sh` registers a Windows task through `schtasks.exe` that
-starts WSL in the background (`conhost --headless`) to keep the console window hidden. The task
-fires at `DUDE_SCAN_HOUR` in Windows local time. Keep the repo inside the WSL filesystem
-(`~/dude`), not under `/mnt/c`.
+**Windows (experimental).** Not yet tested on a real machine; reports welcome. Install
+[WSL2](https://learn.microsoft.com/windows/wsl/install) with Ubuntu and follow Setup inside it.
+`install_timer.sh` registers a Windows task through `schtasks.exe` that starts WSL in the
+background (`conhost --headless`) to keep the console window hidden. The task fires at
+`DUDE_SCAN_HOUR` in Windows local time. Keep the repo inside the WSL filesystem (`~/dude`), not
+under `/mnt/c`.
 
 ## Daily use
 
